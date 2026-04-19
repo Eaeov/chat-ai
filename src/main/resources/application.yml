@@ -1,0 +1,63 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: chat-ai
+  profiles:
+    active: dev
+  main:
+    allow-circular-references: true
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${DB_URL:jdbc:mysql://localhost:3306/ai_chat?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&allowMultiQueries=true&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=Asia/Shanghai}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:123456}
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:123456}
+      database: ${REDIS_DATABASE:2}
+
+  rabbitmq:
+    host: ${RABBITMQ_HOST:192.168.100.128}
+    port: ${RABBITMQ_PORT:5672}
+    virtual-host: ${RABBITMQ_VIRTUAL_HOST:/}
+    username: ${RABBITMQ_USERNAME:zyj}
+    password: ${RABBITMQ_PASSWORD:123456}
+
+  ai:
+    dashscope:
+      api-key: ${DASHSCOPE_API_KEY:your-api-key-here}
+      chat:
+        options:
+          model: qwen-plus
+          temperature: 0.7
+        enabled: false
+
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  type-aliases-package: com.zyj.chatai.pojo
+  global-config:
+    db-config:
+      id-type: auto
+  configuration:
+    map-underscore-to-camel-case: true
+
+jwt:
+  expire: 86400000
+  secret: ${JWT_SECRET:My$ecureJWT#Key2026@ChatAI!System}
+  token-name: Authorization
+
+# 自定义配置：专门管理多个模型的参数
+ai:
+  models:
+    qwen-turbo: qwen-turbo      # 轻量高速，响应快、成本低，适合高并发/简单任务（如客服问答、基础摘要）
+    qwen-plus: qwen-plus      # 平衡型主力模型，强推理+多轮对话+中长文本理解，综合性能优，适用大多数业务场景
+#    qwen-max: qwen-max        # 当前最强闭源版本（需申请开通），擅长复杂推理、代码生成、多步骤逻辑、高精度创作
+#    qwen-1.5-7b: qwen-1.5-7b     # 开源轻量版（7B参数），可私有部署，适合边缘/本地化场景，推理速度快、资源占用低
+#    qwen-1.5-14b: qwen-1.5-14b    # 开源中型版（14B），更强语言与工具调用能力，兼顾性能与效果
+#    qwen-2-72b: qwen-2-72b      # 开源旗舰版（72B），接近闭源qwen-max能力，适合高性能私有部署（需较强算力）
