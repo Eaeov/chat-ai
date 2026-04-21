@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -45,9 +46,16 @@ public class SessionConsumer {
     public void generateSessionTitleIfNeeded(Long sessionId, String firstUserMessage) {
         // 1. 检查会话是否已经有标题
         Session session = sessionService.getById(sessionId);
-        if (session == null || (session.getTitle() != null && !session.getTitle().isEmpty())) {
+        if (session == null ) {
             return; // 已经有标题了，不需要生成
         }
+        String currentTitle = session.getTitle();
+        // 只有当标题为空，或者是前端默认的"新会话"时，才触发 AI 生成
+        // 如果用户已经手动修改过标题（不是"新会话"），则不再覆盖
+        if (currentTitle != null && !currentTitle.isEmpty() && !currentTitle.equals("新会话")) {
+            return;
+        }
+
 
         try {
             // 2. 调用 AI 生成简短标题
@@ -64,6 +72,9 @@ public class SessionConsumer {
                         .set(Session::getTitle, title.length() > 20 ? title.substring(0, 20) : title);
                 sessionService.update(updateWrapper);
                 log.info("会话 {} 标题自动生成成功: {}", sessionId, title);
+                //删除redis中的会话列表
+                sessionService.clearUserSessionCache(session.getUserId());
+
             }
         } catch (Exception e) {
             log.error("生成会话标题失败", e);

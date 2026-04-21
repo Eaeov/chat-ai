@@ -72,6 +72,20 @@ public class AiController {
         return emitter;
     }
 
+    /**
+     * 向AI发送消息并获取响应
+     */
+    public Result sendMessage(@RequestBody ChatMessage chatMessage) {
+        ChatClient chatClient = getChatClient(chatMessage.getModel());
+        String images = "";
+        chatClient.prompt()
+//                .user()
+                .call()
+                .content()
+                .trim();
+        return Result.success();
+    }
+
 }
 //可以用myChatModel 来创建多个模型
 //ChatModel myChatModel = ... // already autoconfigured by Spring Boot

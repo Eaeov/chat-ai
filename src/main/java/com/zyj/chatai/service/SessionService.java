@@ -34,4 +34,9 @@ public interface SessionService extends IService<Session> {
      * 删除会话
      */
     boolean deleteSession(Long id);
+
+    /**
+     * 清除指定用户的会话列表缓存
+     */
+    void clearUserSessionCache(Long userId);
 }

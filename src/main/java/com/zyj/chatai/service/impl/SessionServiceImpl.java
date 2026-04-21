@@ -193,7 +193,7 @@ public class SessionServiceImpl extends ServiceImpl<SessionMapper, Session> impl
      *
      * @param userId 用户ID
      */
-    private void clearUserSessionCache(Long userId) {
+    public void clearUserSessionCache(Long userId) {
         if (userId != null) {
             String key = SESSION_CACHE_KEY_PREFIX + userId;
             stringRedisTemplate.delete(key);
